@@ -47,6 +47,18 @@ namespace List
             }
         }
 
+        public int GetValue(int index)
+        {
+            if (index <= Length)
+            {
+                return _array[index];
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
         private void UpSize()
         {
             int newLength = (int)(_array.Length * 1.33 + 1);
