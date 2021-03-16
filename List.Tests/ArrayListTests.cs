@@ -4,6 +4,6 @@ namespace List.Tests
 {
     public class ArrayListTests
     {
-
+        //Индексатор, энумератор
     }
 }
