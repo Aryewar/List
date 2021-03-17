@@ -72,16 +72,6 @@ namespace List
             }
         }
 
-        public int GetValue(int index)
-        {
-            if (index < Length && index >= 0)
-            {
-                return _array[index];
-            }
-
-            throw new IndexOutOfRangeException("Index Out Of Randge ");
-        }
-
         public void Remove()
         {
             --Length;
@@ -149,7 +139,7 @@ namespace List
                 Resize(Length);
         }
 
-        public int IndexOf(int value)
+        public int GetIndex(int value)
         {
             for (int i = 0; i < Length; ++i)
             {
@@ -162,20 +152,7 @@ namespace List
             return -1;
         }
 
-        public void ChangeByIndex(int index, int value)
-        {
-            if (index < Length && index >= 0)
-            {
-
-                _array[index] = value;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException("Index Out Of Randge ");
-            }
-        }
-
-        public void ReversArray()
+        public void Reverse()
         {
             int swapIndex;
             for (int i = 0; i < Length / 2; ++i)
@@ -185,7 +162,7 @@ namespace List
             }
         }
 
-        public int MaxI()
+        public int GetMaxIndex()
         {
             int maxIndexOfElement = 0;
             for (int i = 1; i < Length; ++i)
@@ -199,7 +176,7 @@ namespace List
             return maxIndexOfElement;
         }
 
-        public int MinI()
+        public int GetMinIndex()
         {
             int minIndexOfElement = 0;
 
@@ -214,28 +191,46 @@ namespace List
             return minIndexOfElement;
         }
 
-        public int Max()
+        public int GetMax()
         {
-            return _array[MaxI()];
+            return _array[GetMaxIndex()];
         }
 
-        public int Min()
+        public int GetMin()
         {
-            return _array[MinI()];
+            return _array[GetMinIndex()];
         }
 
-        public void RemoveValue(int value)
+        public int this[int index]
         {
-            RemoveByIndex(IndexOf(value));
+            get
+            {
+                if (index < Length && index >= 0)
+                {
+                    return _array[index];
+                }
+
+                throw new IndexOutOfRangeException("Index Out Of Randge ");
+            }
+
+            set
+            {
+                _array[index] = value;
+            }
         }
 
-        public void RemoveAllValue(int value)
+        public void RemoveByValue(int value)
         {
-            int indexOfElements = IndexOf(value);
+            RemoveByIndex(GetIndex(value));
+        }
+
+        public void RemoveAllByValue(int value)
+        {
+            int indexOfElements = GetIndex(value);
             while (indexOfElements != -1)
             {
                 RemoveByIndex(indexOfElements);
-                indexOfElements = IndexOf(value);
+                indexOfElements = GetIndex(value);
             }
         }
 
