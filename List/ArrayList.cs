@@ -32,6 +32,26 @@ namespace List
             }
         }
 
+        private void ShiftRight(int index, int nElements)
+        {
+
+            for (int i = Length - 1; i > index; i--)
+            {
+                _array[i] = _array[i - nElements];
+
+            }
+        }
+
+        private void ShiftLeft(int index, int nElements)
+        {
+
+            for (int i = index; i < Length; i++)
+            {
+                _array[i] = _array[i + nElements];
+            }
+
+        }
+
         public void Add(int value)
         {
             Resize(Length);
@@ -39,17 +59,36 @@ namespace List
             ++Length;
         }
 
+        public void Add(ArrayList list)
+        {
+            int oldLength = Length;
+            Length += list.Length;
+            Resize(oldLength);
+            for(int i = 0; i < list.Length; ++i)
+            {
+                _array[oldLength + i] = list[i];
+            }
+        }
+
+        public void AddFirst(ArrayList list)
+        {
+            int oldLength = Length;
+            Length += list.Length;
+            Resize(oldLength);
+            ShiftRight(list.Length - 1, list.Length);
+
+            for (int i = 0; i < list.Length; ++i)
+            {
+                _array[i] = list[i];
+            }
+        }
+
         public void AddFirst(int value)
         {
-            Resize(Length);
-
-            for (int i = Length; i >= 0; --i)
-            {
-                _array[i + 1] = _array[i];
-            }
-            _array[0] = value;
-
             ++Length;
+            Resize(Length);
+            ShiftRight(0, 1);
+            _array[0] = value;
         }
 
         public void AddByIndex(int index, int value)
@@ -72,21 +111,47 @@ namespace List
             }
         }
 
+        public void AddByIndex(int index, ArrayList list)
+        {
+            if (index < Length && index >= 0)
+            {
+                int oldLength = Length;
+                Length += list.Length;
+                Resize(oldLength);
+                ShiftRight(index + list.Length, list.Length);
+
+                for (int i = 0; i < list.Length; ++i)
+                {
+                    _array[i + index + 1] = list[i];
+                }
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("Index Out Of Randge ");
+            }
+        }
+
         public void Remove()
         {
-            --Length;
-            Resize(Length);
-
+            if (Length > 0)
+            {
+                --Length;
+                Resize(Length);
+            }
         }
 
         public void RemoveFirst()
         {
-            for (int i = 0; i < Length; ++i)
+            if (Length > 0)
             {
-                _array[i] = _array[i + 1];
+                for (int i = 0; i < Length; ++i)
+                {
+                    _array[i] = _array[i + 1];
+                }
+
+                --Length;
             }
 
-            --Length;
             Resize(Length);
         }
 
@@ -205,17 +270,17 @@ namespace List
         {
             get
             {
-                if (index < Length && index >= 0)
-                {
-                    return _array[index];
-                }
-
-                throw new IndexOutOfRangeException("Index Out Of Randge ");
+                return _array[index];
             }
 
             set
             {
-                _array[index] = value;
+                if (index < Length && index >= 0)
+                {
+                    _array[index] = value;
+                }
+
+                throw new IndexOutOfRangeException("Index Out Of Randge ");
             }
         }
 
@@ -268,40 +333,19 @@ namespace List
             return isEqual;
         }
 
-        private void Resize(int newLength)
+        private void Resize(int oldLength)
         {
-            if(newLength >= _array.Length)
+            if((Length >= _array.Length) || (Length <= _array.Length / 2))
             {
-                newLength = (int)(newLength * 1.33d + 1);
-                newArray(newLength);
-            }
-            else if((newLength <= _array.Length / 2) && (newLength > 10))
-            {
-                newLength = (int)(newLength * 0.66d + 1);
-                newArray(newLength);
-            }
-            else if(newLength < 0)
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-
-        private void newArray(int newLength)
-        {
-            if (newLength >= 0)
-            {
+                int newLength = (int)(Length * 1.33d + 1);
                 int[] tempArray = new int[newLength];
 
-                for (int i = 0; i < Length; ++i)
+                for (int i = 0; i < oldLength; ++i)
                 {
                     tempArray[i] = _array[i];
                 }
 
                 _array = tempArray;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException();
             }
         }
 
