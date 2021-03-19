@@ -7,6 +7,8 @@ namespace List
         public int Length { get; private set; }
 
         private int[] _array;
+        private const int zeroIndex = 0;
+        private const int shiftByOne = 1;
 
         public ArrayList()
         {
@@ -23,33 +25,20 @@ namespace List
 
         public ArrayList(int[] initArray)
         {
-            Length = initArray.Length;
-            _array = new int[(int)(Length * 1.33d + 1)];
-
-            for (int i = 0; i < Length; ++i)
+            if (initArray != null)
             {
-                _array[i] = initArray[i];
+                Length = initArray.Length;
+                _array = new int[(int)(Length * 1.33d + 1)];
+
+                for (int i = 0; i < Length; ++i)
+                {
+                    _array[i] = initArray[i];
+                }
             }
-        }
-
-        private void ShiftRight(int index, int nElements)
-        {
-
-            for (int i = Length - 1; i > index; i--)
+            else
             {
-                _array[i] = _array[i - nElements];
-
+                throw new ArgumentNullException();
             }
-        }
-
-        private void ShiftLeft(int index, int nElements)
-        {
-
-            for (int i = index; i < Length; i++)
-            {
-                _array[i] = _array[i + nElements];
-            }
-
         }
 
         public void Add(int value)
@@ -61,25 +50,39 @@ namespace List
 
         public void Add(ArrayList list)
         {
-            int oldLength = Length;
-            Length += list.Length;
-            Resize(oldLength);
-            for(int i = 0; i < list.Length; ++i)
+            if (list != null)
             {
-                _array[oldLength + i] = list[i];
+                int oldLength = Length;
+                Length += list.Length;
+                Resize(oldLength);
+                for (int i = 0; i < list.Length; ++i)
+                {
+                    _array[oldLength + i] = list[i];
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException();
             }
         }
 
         public void AddFirst(ArrayList list)
         {
-            int oldLength = Length;
-            Length += list.Length;
-            Resize(oldLength);
-            ShiftRight(list.Length - 1, list.Length);
-
-            for (int i = 0; i < list.Length; ++i)
+            if (list != null)
             {
-                _array[i] = list[i];
+                int oldLength = Length;
+                Length += list.Length;
+                Resize(oldLength);
+                ShiftRight(list.Length - 1, list.Length);
+
+                for (int i = 0; i < list.Length; ++i)
+                {
+                    _array[i] = list[i];
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException();
             }
         }
 
@@ -87,20 +90,18 @@ namespace List
         {
             ++Length;
             Resize(Length);
-            ShiftRight(0, 1);
-            _array[0] = value;
+            ShiftRight(zeroIndex, shiftByOne);
+            _array[zeroIndex] = value;
         }
 
         public void AddByIndex(int index, int value)
         {
             if (index < Length && index >= 0)
             {
-                Resize(Length);
+                int countElements = 1;
 
-                for (int i = Length; i >= index; --i)
-                {
-                    _array[i + 1] = _array[i];
-                }
+                Resize(Length);
+                ShiftRight(index, countElements);
 
                 _array[index] = value;
                 ++Length;
@@ -113,21 +114,23 @@ namespace List
 
         public void AddByIndex(int index, ArrayList list)
         {
-            if (index < Length && index >= 0)
-            {
-                int oldLength = Length;
-                Length += list.Length;
-                Resize(oldLength);
-                ShiftRight(index + list.Length, list.Length);
-
-                for (int i = 0; i < list.Length; ++i)
-                {
-                    _array[i + index + 1] = list[i];
-                }
-            }
-            else
+            if (index > Length && index < 0)
             {
                 throw new IndexOutOfRangeException("Index Out Of Randge ");
+            }
+            if(list == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            int oldLength = Length;
+            Length += list.Length;
+            Resize(oldLength);
+            ShiftRight(index + list.Length, list.Length);
+
+            for (int i = 0; i < list.Length; ++i)
+            {
+                _array[i + index + 1] = list[i];
             }
         }
 
@@ -144,11 +147,7 @@ namespace List
         {
             if (Length > 0)
             {
-                for (int i = 0; i < Length; ++i)
-                {
-                    _array[i] = _array[i + 1];
-                }
-
+                ShiftLeft(zeroIndex, shiftByOne);
                 --Length;
             }
 
@@ -157,11 +156,7 @@ namespace List
 
         public void RemoveByIndex(int index)
         {
-            for (int i = index; i < Length; ++i)
-            {
-                _array[i] = _array[i + 1];
-
-            }
+            ShiftLeft(index, shiftByOne);
 
             --Length;
             Resize(Length);
@@ -177,10 +172,7 @@ namespace List
         {
             Length -= Length >= nElelements ? nElelements : Length;
 
-            for (int i = 0; i < Length; ++i)
-            {
-                _array[i] = _array[i + nElelements];
-            }
+            ShiftLeft(zeroIndex, nElelements);
 
             Resize(Length);
         }
@@ -190,12 +182,7 @@ namespace List
             if (Length - index >= nElelements)
             {
                 Length -= nElelements;
-
-                for (int i = index; i < Length; ++i)
-                {
-                    _array[i] = _array[i + nElelements];
-                }
-
+                ShiftLeft(index, nElelements);
             }
             else
             {
@@ -230,6 +217,7 @@ namespace List
         public int GetMaxIndex()
         {
             int maxIndexOfElement = 0;
+
             for (int i = 1; i < Length; ++i)
             {
                 if (_array[maxIndexOfElement] < _array[i])
@@ -299,6 +287,46 @@ namespace List
             }
         }
 
+        public void SortAscending()
+        {
+            if (_array != null)
+            {
+                for (int i = 0; i < Length; ++i)
+                {
+                    int maxIndex = i;
+                    for (int j = i; j < Length; ++j)
+                    {
+                        if (_array[j] < _array[maxIndex])
+                        {
+                            maxIndex = j;
+                        }
+                    }
+
+                    Swap(i, maxIndex);
+                }
+            }
+        }
+
+        public void SortDescending()
+        {
+            if (_array != null)
+            {
+                for (int i = 0; i < Length; ++i)
+                {
+                    int maxIndex = i;
+                    for (int j = i; j < Length; ++j)
+                    {
+                        if (_array[j] > _array[maxIndex])
+                        {
+                            maxIndex = j;
+                        }
+                    }
+
+                    Swap(i, maxIndex);
+                }
+            }
+        }
+
         public override string ToString()
         {
             string realValues = String.Empty;
@@ -346,6 +374,22 @@ namespace List
                 }
 
                 _array = tempArray;
+            }
+        }
+
+        private void ShiftRight(int index, int nElements)
+        {
+            for (int i = Length - 1; i > index; i--)
+            {
+                _array[i] = _array[i - nElements];
+            }
+        }
+
+        private void ShiftLeft(int index, int nElements)
+        {
+            for (int i = index; i < Length; i++)
+            {
+                _array[i] = _array[i + nElements];
             }
         }
 
