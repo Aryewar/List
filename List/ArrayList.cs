@@ -96,15 +96,14 @@ namespace List
 
         public void AddByIndex(int index, int value)
         {
-            if (index < Length && index >= 0)
+            if ((index == 0 && Length == 0) || (index < Length && index >= 0))
             {
-                int countElements = 1;
-
                 Resize(Length);
-                ShiftRight(index, countElements);
+                ++Length;
+
+                ShiftRight(index, shiftByOne);
 
                 _array[index] = value;
-                ++Length;
             }
             else
             {
@@ -114,23 +113,30 @@ namespace List
 
         public void AddByIndex(int index, ArrayList list)
         {
-            if (index > Length && index < 0)
+            if ((index == 0 && Length == 0) || (index < Length && index >= 0))
+            {
+                if (list != null)
+                {
+                    int oldLength = Length;
+                    Length += list.Length;
+
+                    Resize(oldLength);
+
+                    ShiftRight(index + list.Length - 1, list.Length);
+
+                    for (int i = 0; i < list.Length; ++i)
+                    {
+                        _array[i + index] = list[i];
+                    }
+                }
+                else
+                {
+                    throw new ArgumentNullException();
+                }    
+            }
+            else
             {
                 throw new IndexOutOfRangeException("Index Out Of Randge ");
-            }
-            if(list == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            int oldLength = Length;
-            Length += list.Length;
-            Resize(oldLength);
-            ShiftRight(index + list.Length, list.Length);
-
-            for (int i = 0; i < list.Length; ++i)
-            {
-                _array[i + index + 1] = list[i];
             }
         }
 
@@ -156,42 +162,85 @@ namespace List
 
         public void RemoveByIndex(int index)
         {
-            ShiftLeft(index, shiftByOne);
-
-            --Length;
-            Resize(Length);
-        }
-
-        public void Remove(int nElelements)
-        {
-            Length -= Length >= nElelements ? nElelements : Length;
-            Resize(Length);
-        }
-
-        public void RemoveFirst(int nElelements)
-        {
-            Length -= Length >= nElelements ? nElelements : Length;
-
-            ShiftLeft(zeroIndex, nElelements);
-
-            Resize(Length);
-        }
-
-        public void RemoveByIndex(int index, int nElelements)
-        {
-            if (Length - index >= nElelements)
+            if ((index == 0 && Length == 0) || (index < Length && index >= 0))
             {
-                Length -= nElelements;
-                ShiftLeft(index, nElelements);
+                if (!(Length == 0))
+                {
+                    --Length;
+                    ShiftLeft(index, shiftByOne);
+                }
+
+                Resize(Length);
             }
             else
             {
-                Length = index;
+                throw new IndexOutOfRangeException("Index Out Of Randge ");
             }
-                Resize(Length);
         }
 
-        public int GetIndex(int value)
+        public void Remove(int nElements)
+        {
+            if (nElements >= 0)
+            {
+                Length -= Length >= nElements ? nElements : Length;
+                Resize(Length);
+            }
+            else
+            {
+                throw new ArgumentException("Removing negative number of elements");
+            }
+        }
+
+        public void RemoveFirst(int nElements)
+        {
+            if (nElements >= 0)
+            {
+                Length -= Length >= nElements ? nElements : Length;
+
+                ShiftLeft(zeroIndex, nElements);
+
+                Resize(Length);
+            }
+            else
+            {
+                throw new ArgumentException("Removing negative number of elements");
+            }
+        }
+
+        public void RemoveByIndex(int index, int nElements)
+        {
+            if (nElements >= 0)
+            {
+                if ((index == 0 && Length == 0) || (index < Length && index >= 0))
+                {
+                    if (Length - index >= nElements)
+                    {
+                        Length -= nElements;
+                        ShiftLeft(index, nElements);
+                    }
+                    else if(Length - index > 0)
+                    {
+                        Length = index;
+                    }
+                    else
+                    {
+                        Length = 0;
+                    }
+
+                    Resize(Length);
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Index Out Of Randge ");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Removing negative number of elements");
+            }
+        }
+
+        public int GetIndexByValue(int value)
         {
             for (int i = 0; i < Length; ++i)
             {
@@ -216,32 +265,46 @@ namespace List
 
         public int GetMaxIndex()
         {
-            int maxIndexOfElement = 0;
-
-            for (int i = 1; i < Length; ++i)
+            if (Length != 0)
             {
-                if (_array[maxIndexOfElement] < _array[i])
-                {
-                    maxIndexOfElement = i;
-                }
-            }
+                int maxIndexOfElement = 0;
 
-            return maxIndexOfElement;
+                for (int i = 1; i < Length; ++i)
+                {
+                    if (_array[maxIndexOfElement] < _array[i])
+                    {
+                        maxIndexOfElement = i;
+                    }
+                }
+
+                return maxIndexOfElement;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         public int GetMinIndex()
         {
-            int minIndexOfElement = 0;
-
-            for (int i = 1; i < Length; ++i)
+            if (Length != 0)
             {
-                if (_array[minIndexOfElement] > _array[i])
-                {
-                    minIndexOfElement = i;
-                }
-            }
+                int minIndexOfElement = 0;
 
-            return minIndexOfElement;
+                for (int i = 1; i < Length; ++i)
+                {
+                    if (_array[minIndexOfElement] > _array[i])
+                    {
+                        minIndexOfElement = i;
+                    }
+                }
+
+                return minIndexOfElement;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         public int GetMax()
@@ -274,16 +337,22 @@ namespace List
 
         public void RemoveByValue(int value)
         {
-            RemoveByIndex(GetIndex(value));
+            int index = GetIndexByValue(value);
+
+            if (!(index == -1))
+            {
+                RemoveByIndex(index);
+            }
         }
 
         public void RemoveAllByValue(int value)
         {
-            int indexOfElements = GetIndex(value);
+            int indexOfElements = GetIndexByValue(value);
+
             while (indexOfElements != -1)
             {
                 RemoveByIndex(indexOfElements);
-                indexOfElements = GetIndex(value);
+                indexOfElements = GetIndexByValue(value);
             }
         }
 
@@ -379,7 +448,7 @@ namespace List
 
         private void ShiftRight(int index, int nElements)
         {
-            for (int i = Length - 1; i > index; i--)
+            for (int i = Length - 1; i > index; --i)
             {
                 _array[i] = _array[i - nElements];
             }
