@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using System;
 
-//Индексатор, энумератор
 namespace List.Tests
 {
     public class ArrayListTests
@@ -174,14 +173,14 @@ namespace List.Tests
         [TestCase(new int[] { 3, 3, 3, 3, 3, 3 }, 6, 4, new int[] { 3, 3, 3, 3, 3, 4, 3 })]
         public void AddByIndex_WhenValueAndIndexPassed_ThenReturnIndexOutOfRangeException(int[] arrayForActualList, int index, int value, int[] arrayForExpectedList)
         {
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<IndexOutOfRangeException>((TestDelegate)(() =>
             {
 
-                ArrayList actual = new ArrayList(arrayForActualList);
-                ArrayList expected = new ArrayList(arrayForExpectedList);
+                ArrayList actual = new ArrayList((int[])arrayForActualList);
+                ArrayList expected = new ArrayList((int[])arrayForExpectedList);
 
                 actual.AddByIndex(index, value);
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3 }, 2, new int[] { 4, 5, 6 }, new int[] { 1, 2, 4, 5, 6, 3 })]
@@ -206,16 +205,16 @@ namespace List.Tests
         [TestCase(new int[] { 1, 2, 3 }, 3, new int[] { 4, 5, 6 }, new int[] { 1, 4, 5, 6, 2, 3 })]
         public void AddByIndex_WhenListAndIndexPassed_ThenReturnIndexOutOfRangeException(int[] arrayForActualList, int index, int[] arrayForList, int[] arrayForExpectedList)
         {
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<IndexOutOfRangeException>((TestDelegate)(() =>
             {
-                ArrayList actual = new ArrayList(arrayForActualList);
-                ArrayList expected = new ArrayList(arrayForExpectedList);
-                ArrayList list = new ArrayList(arrayForList);
+                ArrayList actual = new ArrayList((int[])arrayForActualList);
+                ArrayList expected = new ArrayList((int[])arrayForExpectedList);
+                ArrayList list = new ArrayList((int[])arrayForList);
 
                 actual.AddByIndex(index, list);
 
                 Assert.AreEqual(expected, actual);
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3 }, new int[] { 1, 2 })]
@@ -289,12 +288,12 @@ namespace List.Tests
         [TestCase(new int[] { 3, 3, 3, 3, 3, 3 }, 6)]
         public void RemoveByIndex_WhenIndexPassed_ThenReturnIndexOutOfRangeException(int[] arrayForActualList, int index)
         {
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<IndexOutOfRangeException>((TestDelegate)(() =>
             {
-                ArrayList actual = new ArrayList(arrayForActualList);
+                ArrayList actual = new ArrayList((int[])arrayForActualList);
 
                 actual.RemoveByIndex(index);
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3 }, 0, 3, new int[] { })]
@@ -320,23 +319,23 @@ namespace List.Tests
         [TestCase(new int[] { 3, 3, 3, 3, 3, 3 }, 6, 2)]
         public void RemoveByIndex_WhenIndexAndNElements_ThenReturnIndexOutOfRangeException(int[] arrayForActualList, int index, int nElements)
         {
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<IndexOutOfRangeException>((TestDelegate)(() =>
             {
-                ArrayList actual = new ArrayList(arrayForActualList);
+                ArrayList actual = new ArrayList((int[])arrayForActualList);
 
                 actual.RemoveByIndex(index, nElements);
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3 }, 0, -1)]
         public void RemoveByIndex_WhenIndexAndNElements_ThenReturnArgumentException(int[] arrayForActualList, int index, int nElements)
         {
-            Assert.Throws<ArgumentException>(() =>
+            Assert.Throws<ArgumentException>((TestDelegate)(() =>
             {
-                ArrayList actual = new ArrayList(arrayForActualList);
+                ArrayList actual = new ArrayList((int[])arrayForActualList);
 
                 actual.RemoveByIndex(index, nElements);
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 2, 1)]
@@ -377,11 +376,11 @@ namespace List.Tests
         [TestCase(new int[] { }, 6)]
         public void GetMaxIndex_WhenMethodCalled_ThenReturnArgumentException(int[] arrayForActualList, int expected)
         {
-            Assert.Throws<ArgumentException>(() =>
+            Assert.Throws<ArgumentException>((TestDelegate)(() =>
             {
-                ArrayList list = new ArrayList(arrayForActualList);
+                ArrayList list = new ArrayList((int[])arrayForActualList);
                 int actual = list.GetMaxIndex();
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 0)]
@@ -397,11 +396,11 @@ namespace List.Tests
         [TestCase(new int[] { }, 6)]
         public void GetMinIndex_WhenMethodCalled_ThenReturnArgumentException(int[] arrayForActualList, int expected)
         {
-            Assert.Throws<ArgumentException>(() =>
+            Assert.Throws<ArgumentException>((TestDelegate)(() =>
             {
-                ArrayList list = new ArrayList(arrayForActualList);
+                ArrayList list = new ArrayList((int[])arrayForActualList);
                 int actual = list.GetMinIndex();
-            });
+            }));
         }
 
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 8)]

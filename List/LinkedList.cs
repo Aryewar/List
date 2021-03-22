@@ -2,7 +2,7 @@
 
 namespace List
 {
-    class ArrayList
+    public class LinkedList
     {
         public int Length { get; private set; }
 
@@ -10,21 +10,21 @@ namespace List
         private MyNode _tail;
 
 
-        public ArrayList()
+        public LinkedList()
         {
             Length = 0;
             _head = null;
             _tail = null;
         }
 
-        public ArrayList(int value)
+        public LinkedList(int value)
         {
             Length = 1;
             _head = new MyNode(value);
             _tail = _head;
         }
 
-        public ArrayList(int[] values)
+        public LinkedList(int[] values)
         {
             Length = 0;
 
