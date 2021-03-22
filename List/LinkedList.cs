@@ -50,9 +50,18 @@ namespace List
 
         public void Add(int value)
         {
-            _tail.Next = new MyNode(value);
-            _tail = _tail.Next;
-            ++Length;
+            if (Length != 0)
+            {
+                _tail.Next = new MyNode(value);
+                _tail = _tail.Next;
+                ++Length;
+            }
+            else
+            {
+                Length = 1;
+                _head = new MyNode(value);
+                _tail = _head;
+            }
         }
 
         public int this[int index]
@@ -82,6 +91,57 @@ namespace List
             }
 
             return currentNode;
+        }
+
+        public override string ToString()
+        {
+            if (Length != 0)
+            {
+                MyNode currentNode = _head;
+                string s = currentNode.Value + " ";
+
+                while (!(currentNode.Next is null))
+                {
+                    currentNode = currentNode.Next;
+                    s += currentNode.Value + " ";
+                }
+
+                return s;
+            }
+            else
+            {
+                return String.Empty;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            LinkedList list = (LinkedList)obj;
+
+            if (this.Length != list.Length)
+            {
+                return false;
+            }
+
+            MyNode currentThis = this._head;
+            MyNode currentList = list._head;
+
+            while (!(currentThis.Next is null))
+            {
+                if (currentThis.Value != currentList.Value)
+                {
+                    return false;
+                }
+                currentList = currentList.Next;
+                currentThis = currentThis.Next;
+            }
+
+            if (currentThis.Value != currentList.Value)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
