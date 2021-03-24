@@ -130,29 +130,35 @@ namespace List
 
         public void AddByIndex(int index, LinkedList newList)
         {
-            if (index != 0)
+            if (index >= 0 || index < Length)
             {
-                if (newList.Length != 0)
+                if (index != 0)
                 {
-
-                    MyNode current = GetNodeByIndex(index - 1);
-
-                    newList._tail.Next = current.Next;
-                    newList._tail = _tail;
-                    _tail = current;
-
-                    int newLengthList = newList.Length + Length - index;
-                    Length = index;
-
-                    for (int i = 0; i < newLengthList; i++)
+                    if (newList.Length != 0)
                     {
-                        Add(newList[i]);
+                        MyNode current = GetNodeByIndex(index - 1);
+
+                        newList._tail.Next = current.Next;
+                        _tail = current;
+                        int newLengthList = newList.Length + Length - index;
+                        Length = index;
+
+                        for (int i = 0; i < newLengthList; i++)
+                        {
+                            Add(newList[i]);
+                        }
+
+                        newList._tail.Next = null;
                     }
+                }
+                else
+                {
+                    AddFirst(newList);
                 }
             }
             else
             {
-                AddFirst(newList);
+                throw new IndexOutOfRangeException();
             }
         }
 
@@ -229,30 +235,78 @@ namespace List
 
         public void RemoveByIndex(int index, int nElements)
         {
-            if (Length != 0)
+            if ((index >= 0 && index < Length) && nElements >= 0)
             {
-                if (Length - nElements > 0)
+                if (Length != 0 || nElements != 0)
                 {
                     if (index != 0)
                     {
-                        MyNode indexNode = GetNodeByIndex(index - 1);
-                        MyNode nElementNode = GetNodeByIndex(index + nElements);
-                        indexNode.Next = nElementNode.Next;
-                        Length -= nElements;
+                        if (Length - index - nElements > 0)
+                        {
+                            MyNode sectionStart = GetNodeByIndex(index - 1);
+                            MyNode sectionEnd = GetNodeByIndex(index + nElements);
+
+                            sectionStart.Next = sectionEnd;
+                            Length -= nElements;
+                        }
+                        else
+                        {
+                            MyNode sectionStart = GetNodeByIndex(index - 1);
+                            sectionStart.Next = null;
+                            _tail = sectionStart;
+                            Length = index;
+                        }
                     }
                     else
                     {
                         RemoveFirst(nElements);
                     }
                 }
-                else
-                {
-                    Length = 0;
-                    _head = null;
-                    _tail = null;
-                }
+            }
+            else
+            {
+                throw new ArgumentException("Wrong arguments");
             }
         }
+
+        public void RemoveByValue(int value)
+        {
+            int index = GetIndexByValue(value);
+
+            if(index != -1)
+            {
+                RemoveByIndex(index);
+            }
+        }
+
+        public void RemoveAllByValue(int value)
+        {
+            int index = GetIndexByValue(value);
+
+            while(index != -1)
+            {
+                RemoveByIndex(index);
+                index = GetIndexByValue(value);
+            }
+        }
+
+        public int GetIndexByValue(int value)
+        {
+            MyNode currentNode = _head;
+
+            for(int i = 0; i < Length; ++i)
+            {
+                if(currentNode.Value == value)
+                {
+                    return i;
+                }
+
+                currentNode = currentNode.Next;
+            }
+
+            return -1;
+        }
+
         public int this[int index]
         {
             get

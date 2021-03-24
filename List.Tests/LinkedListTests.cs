@@ -24,7 +24,7 @@ namespace List.Tests
         [TestCase(new int[] { 1, 2, 3 }, 0, new int[] { }, new int[] { 1, 2, 3 })]
         [TestCase(new int[] { 1, 2, 3 }, 2, new int[] { }, new int[] { 1, 2, 3 })]
         [TestCase(new int[] { }, 0, new int[] { }, new int[] { })]
-        [TestCase(new int[] {1 }, 0, new int[] { 1 }, new int[] { 1, 1 })]
+        [TestCase(new int[] { 1 }, 0, new int[] { 1 }, new int[] { 1, 1 })]
         public void AddByIndex_WhenListAndIndexPassed_ThenAddListByIndex(int[] arrayForActualList, int index, int[] arrayForList, int[] arrayForExpectedList)
         {
             LinkedList actual = new LinkedList(arrayForActualList);
