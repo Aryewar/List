@@ -326,59 +326,32 @@ namespace List
         {
             if (!(this is null))
             {
+                MyNode new_root = null;
 
-                int oldLength = Length;
-
-                while (Length > 1)
+                while (_head != null)
                 {
-                    MyNode min = _head;
-                    MyNode previousNode = _head;
-                    MyNode nextNode = _head.Next.Next;
+                    MyNode node = _head;
+                    _head = _head.Next;
 
-                    if (min.Value > min.Next.Value)
+                    if (new_root == null || node.Value > new_root.Value)
                     {
-                        min = min.Next;
-                        nextNode = nextNode.Next;
+                        node.Next = new_root;
+                        new_root = node;
                     }
                     else
                     {
-                        min.Next.Next = min;
-                        previousNode = min.Next;
-                        _head = min.Next;
-                        min.Next = nextNode;
-                        nextNode = nextNode.Next;
-                    }
-
-                    while(!(nextNode is null))
-                    {
-                        if (min.Value > min.Next.Value)
+                        MyNode current = new_root;
+                        while (current.Next != null && !(node.Value > current.Next.Value))
                         {
-                            min = min.Next;
-                            previousNode = previousNode.Next;
-                            nextNode = nextNode.Next;
+                            current = current.Next;
                         }
-                        else
-                        {
-                            min.Next.Next = min;
-                            previousNode.Next = min.Next;
-                            min.Next = nextNode;
-                            nextNode = nextNode.Next;
-                            previousNode = previousNode.Next;
-                        }
-                    }
 
-                    if (min.Value < min.Next.Value)
-                    {
-                        _tail.Next = min;
-                        previousNode.Next = _tail;
-                        min.Next = null;
-                        _tail = min;
+                        node.Next = current.Next;
+                        current.Next = node;
                     }
-
-                    --Length;
                 }
 
-                Length = oldLength;
+                _head = new_root;
             }
             else
             {
@@ -390,59 +363,32 @@ namespace List
         {
             if (!(this is null))
             {
+                MyNode new_root = null;
 
-                int oldLength = Length;
-
-                while (Length > 1)
+                while (_head != null)
                 {
-                    MyNode min = _head;
-                    MyNode previousNode = _head;
-                    MyNode nextNode = _head.Next.Next;
+                    MyNode node = _head;
+                    _head = _head.Next;
 
-                    if (min.Value < min.Next.Value)
+                    if (new_root == null || node.Value < new_root.Value)
                     {
-                        min = min.Next;
-                        nextNode = nextNode.Next;
+                        node.Next = new_root;
+                        new_root = node;
                     }
                     else
                     {
-                        min.Next.Next = min;
-                        previousNode = min.Next;
-                        _head = min.Next;
-                        min.Next = nextNode;
-                        nextNode = nextNode.Next;
-                    }
-
-                    while (!(nextNode is null))
-                    {
-                        if (min.Value < min.Next.Value)
+                        MyNode current = new_root;
+                        while (current.Next != null && !(node.Value < current.Next.Value))
                         {
-                            min = min.Next;
-                            previousNode = previousNode.Next;
-                            nextNode = nextNode.Next;
+                            current = current.Next;
                         }
-                        else
-                        {
-                            min.Next.Next = min;
-                            previousNode.Next = min.Next;
-                            min.Next = nextNode;
-                            nextNode = nextNode.Next;
-                            previousNode = previousNode.Next;
-                        }
-                    }
 
-                    if (min.Value > min.Next.Value)
-                    {
-                        _tail.Next = min;
-                        previousNode.Next = _tail;
-                        min.Next = null;
-                        _tail = min;
+                        node.Next = current.Next;
+                        current.Next = node;
                     }
-
-                    --Length;
                 }
 
-                Length = oldLength;
+                _head = new_root;
             }
             else
             {
