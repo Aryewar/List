@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace List
 {
@@ -6,8 +7,8 @@ namespace List
     {
         public int Length { get; private set; }
 
-        private MyNode _head;
-        private MyNode _tail;
+        private Node _head;
+        private Node _tail;
 
         public LinkedList()
         {
@@ -19,7 +20,7 @@ namespace List
         public LinkedList(int value)
         {
             Length = 1;
-            _head = new MyNode(value);
+            _head = new Node(value);
             _tail = _head;
         }
 
@@ -52,12 +53,12 @@ namespace List
         {
             if (Length != 0)
             {
-                _tail.Next = new MyNode(value);
+                _tail.Next = new Node(value);
                 _tail = _tail.Next;
             }
             else
             {
-                _head = new MyNode(value);
+                _head = new Node(value);
                 _tail = _head;
             }
 
@@ -82,7 +83,7 @@ namespace List
         public void AddFirst(int value)
         {
             ++Length;
-            MyNode first = new MyNode(value);
+            Node first = new Node(value);
             first.Next = _head;
             _head = first;
         }
@@ -108,8 +109,8 @@ namespace List
             {
                 if (index != 0)
                 {
-                    MyNode ByIndex = new MyNode(value);
-                    MyNode current = GetNodeByIndex(index - 1);
+                    Node ByIndex = new Node(value);
+                    Node current = GetNodeByIndex(index - 1);
 
                     ByIndex.Next = current.Next;
                     current.Next = ByIndex;
@@ -135,7 +136,7 @@ namespace List
                 {
                     if (newList.Length != 0)
                     {
-                        MyNode current = GetNodeByIndex(index - 1);
+                        Node current = GetNodeByIndex(index - 1);
 
                         newList._tail.Next = current.Next;
                         _tail = current;
@@ -187,10 +188,13 @@ namespace List
                 {
                     if (Length != 1)
                     {
-                        MyNode current = GetNodeByIndex(index - 1);
-
+                        Node current = GetNodeByIndex(index - 1);
                         current.Next = current.Next.Next;
-                        _tail = current;
+
+                        if (current.Next is null)
+                        {
+                            _tail = current;
+                        }
                     }
                     else
                     {
@@ -275,15 +279,15 @@ namespace List
                     {
                         if (Length - index - nElements > 0)
                         {
-                            MyNode sectionStart = GetNodeByIndex(index - 1);
-                            MyNode sectionEnd = GetNodeByIndex(index + nElements);
+                            Node sectionStart = GetNodeByIndex(index - 1);
+                            Node sectionEnd = GetNodeByIndex(index + nElements);
 
                             sectionStart.Next = sectionEnd;
                             Length -= nElements;
                         }
                         else
                         {
-                            MyNode sectionStart = GetNodeByIndex(index - 1);
+                            Node sectionStart = GetNodeByIndex(index - 1);
                             sectionStart.Next = null;
                             _tail = sectionStart;
                             Length = index;
@@ -326,11 +330,11 @@ namespace List
         {
             if (!(this is null))
             {
-                MyNode new_root = null;
+                Node new_root = null;
 
                 while (_head != null)
                 {
-                    MyNode node = _head;
+                    Node node = _head;
                     _head = _head.Next;
 
                     if (new_root == null || node.Value > new_root.Value)
@@ -340,7 +344,7 @@ namespace List
                     }
                     else
                     {
-                        MyNode current = new_root;
+                        Node current = new_root;
                         while (current.Next != null && !(node.Value > current.Next.Value))
                         {
                             current = current.Next;
@@ -363,11 +367,11 @@ namespace List
         {
             if (!(this is null))
             {
-                MyNode new_root = null;
+                Node new_root = null;
 
                 while (_head != null)
                 {
-                    MyNode node = _head;
+                    Node node = _head;
                     _head = _head.Next;
 
                     if (new_root == null || node.Value < new_root.Value)
@@ -377,7 +381,7 @@ namespace List
                     }
                     else
                     {
-                        MyNode current = new_root;
+                        Node current = new_root;
                         while (current.Next != null && !(node.Value < current.Next.Value))
                         {
                             current = current.Next;
@@ -403,8 +407,8 @@ namespace List
                 if (Length > 1)
                 {
                     _tail.Next = _head;
-                    MyNode stepByOne = _head.Next;
-                    MyNode stepBySecond = _head.Next.Next;
+                    Node stepByOne = _head.Next;
+                    Node stepBySecond = _head.Next.Next;
                     _head.Next = null;
 
                     while (!(stepBySecond is null))
@@ -433,7 +437,7 @@ namespace List
         {
             if (Length != 0 || this is null)
             {
-                MyNode current = _head;
+                Node current = _head;
                 int maxIndex = 0;
                 int maxValue = _head.Value;
                 for (int i = 1; i < Length; i++)
@@ -459,7 +463,7 @@ namespace List
         {
             if (Length != 0 || this is null)
             {
-                MyNode current = _head;
+                Node current = _head;
                 int minIndex = 0;
                 int minValue = _head.Value;
                 for (int i = 1; i < Length; i++)
@@ -480,14 +484,13 @@ namespace List
             throw new ArgumentException("List is null");
         }
 
-
         // Max for Svyatoslav
         // FindMaxElement for Maksim
         public int GetMaxElement()
         {
             if (Length != 0 || this is null)
             {
-                MyNode current = _head;
+                Node current = _head;
                 int maxValue = _head.Value;
                 for (int i = 1; i < Length; i++)
                 {
@@ -511,7 +514,7 @@ namespace List
         {
             if (Length != 0 || this is null)
             {
-                MyNode current = _head;
+                Node current = _head;
                 int minValue = _head.Value;
                 for (int i = 1; i < Length; i++)
                 {
@@ -531,7 +534,7 @@ namespace List
 
         public int GetIndexByValue(int value)
         {
-            MyNode currentNode = _head;
+            Node currentNode = _head;
 
             for(int i = 0; i < Length; ++i)
             {
@@ -559,11 +562,11 @@ namespace List
             }
         }
 
-        private MyNode GetNodeByIndex(int index)
+        private Node GetNodeByIndex(int index)
         {
             if (index >= 0 || index < Length)
             {
-                MyNode currentNode = _head;
+                Node currentNode = _head;
 
                 for (int i = 1; i <= index; ++i)
                 {
@@ -578,23 +581,16 @@ namespace List
 
         public override string ToString()
         {
-            if (Length != 0)
-            {
-                MyNode currentNode = _head;
-                string s = currentNode.Value + " ";
+            StringBuilder stringBulder = new StringBuilder();
+            Node current = _head;
 
-                while (!(currentNode.Next is null))
-                {
-                    currentNode = currentNode.Next;
-                    s += currentNode.Value + " ";
-                }
-
-                return s;
-            }
-            else
+            while (!(current is null))
             {
-                return String.Empty;
+                stringBulder.Append($"{current.Value} ");
+                current = current.Next;
             }
+
+            return stringBulder.ToString().Trim();
         }
 
         public override bool Equals(object obj)
@@ -607,8 +603,8 @@ namespace List
                 if (this.Length == list.Length)
                 {
                     isEqual = true;
-                    MyNode currentThis = this._head;
-                    MyNode currentList = list._head;
+                    Node currentThis = this._head;
+                    Node currentList = list._head;
 
                     while (!(currentThis is null))
                     {

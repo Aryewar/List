@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace List
 {
@@ -398,14 +399,14 @@ namespace List
 
         public override string ToString()
         {
-            string realValues = String.Empty;
+            StringBuilder stringBuilder = new StringBuilder();
 
-            for(int i = 0; i < Length; ++i)
+            for (int i = 0; i < Length; i++)
             {
-                realValues += _array[i] + " ";
+                stringBuilder.Append($"{_array[i]} ");
             }
 
-            return realValues;
+            return stringBuilder.ToString().Trim();
         }
 
         public override bool Equals(object obj)
