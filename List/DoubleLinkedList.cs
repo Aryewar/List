@@ -1,24 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace List
 {
-    public class DoubleLinkedList
+    public class DoubleLinkedList : IList
     {
         private DoubleNode _head;
         private DoubleNode _tail;
 
         public int Length { get; private set; }
+
         public int this[int index]
         {
             get
             {
-                return GetNodeByIndex(index).Value;
+                if (index >= 0 && index < Length)
+                {
+                    return GetNodeByIndex(index).Value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("incorect index");
+                }
             }
             set
             {
-                GetNodeByIndex(index).Value = value;
+                if (index >= 0 && index < Length)
+                {
+                    GetNodeByIndex(index).Value = value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("incorect index");
+                }
             }
         }
 
@@ -28,6 +42,7 @@ namespace List
             _head = null;
             _tail = null;
         }
+
         public DoubleLinkedList(int value)
         {
             Length = 1;
@@ -35,29 +50,14 @@ namespace List
             _tail = _head;
         }
 
-        public DoubleLinkedList(int[] values)
+        public static DoubleLinkedList Create(int[] values)
         {
             if (!(values is null))
             {
-                Length = 0;
+                return new DoubleLinkedList(values);
+            }
 
-                if (values.Length != 0)
-                {
-                    for (int i = 0; i < values.Length; ++i)
-                    {
-                        Add(values[i]);
-                    }
-                }
-                else
-                {
-                    _head = null;
-                    _tail = null;
-                }
-            }
-            else
-            {
-                throw new ArgumentException(" Array is Null");
-            }
+            throw new ArgumentException(" Array is Null");
         }
 
         public void Add(int value)
@@ -78,25 +78,26 @@ namespace List
             ++Length;
         }
 
-        public void Add(DoubleLinkedList list)
+        public void Add(IList obj)
         {
-            if (!(list is null))
+            if (!(obj is null))
             {
+                DoubleLinkedList list = DoubleLinkedList.Create(obj.ToArray());
+
                 DoubleNode current = list._head;
-                int value = 0;
 
                 while (!(current is null))
                 {
-                    value = current.Value;
-                    Add(value);
+                    Add(current.Value);
                     current = current.Next;
                 }
             }
             else
             {
-                throw new ArgumentException(" List is null");
+                throw new ArgumentNullException(" List is null");
             }
         }
+
         public void AddFirst(int value)
         {
             DoubleNode first = new DoubleNode(value);
@@ -117,23 +118,23 @@ namespace List
             ++Length;
         }
 
-        public void AddFirst(DoubleLinkedList list)
+        public void AddFirst(IList obj)
         {
-            if (!(list is null))
+            if (!(obj is null))
             {
+                DoubleLinkedList list = DoubleLinkedList.Create(obj.ToArray());
+
                 DoubleNode current = list._tail;
-                int value = 0;
 
                 while (!(current is null))
                 {
-                    value = current.Value;
-                    AddFirst(value);
+                    AddFirst(current.Value);
                     current = current.Previous;
                 }
             }
             else
             {
-                throw new ArgumentException(" List is null");
+                throw new ArgumentNullException(" List is null");
             }
         }
 
@@ -162,36 +163,45 @@ namespace List
             }
         }
 
-        public void AddByIndex(int index, DoubleLinkedList newList)
+        public void AddByIndex(int index, IList obj)
         {
-            if ((index == Length && Length == 0) || (index >= 0 && index < Length))
+            if (!(obj is null))
             {
-                if (index != 0)
+                if ((index == Length && Length == 0) || (index >= 0 && index < Length))
                 {
-                    if (newList.Length != 0)
+                    DoubleLinkedList newList = DoubleLinkedList.Create(obj.ToArray());
+
+                    if (index != 0)
                     {
-                        DoubleNode current = GetNodeByIndex(index);
-                        DoubleNode NewList = newList._head;
-
-                        for (int i = 0; i < newList.Length; ++i)
+                        if (newList.Length != 0)
                         {
-                            DoubleNode currentNewList = new DoubleNode(NewList.Value);
+                            DoubleNode current = GetNodeByIndex(index);
+                            DoubleNode NewList = newList._head;
 
-                            InsertNode(currentNewList, current);
+                            for (int i = 0; i < newList.Length; i++)
+                            {
+                                DoubleNode currentNewList = new DoubleNode(NewList.Value);
 
-                            NewList = NewList.Next;
-                            ++Length;
+                                InsertNode(currentNewList, current);
+
+                                NewList = NewList.Next;
+                                ++Length;
+                            }
                         }
+                    }
+                    else
+                    {
+                        AddFirst(newList);
                     }
                 }
                 else
                 {
-                    AddFirst(newList);
+                    throw new IndexOutOfRangeException();
                 }
             }
             else
             {
-                throw new IndexOutOfRangeException();
+                throw new ArgumentNullException("obj is null");
             }
         }
 
@@ -199,18 +209,7 @@ namespace List
         {
             if (Length != 0)
             {
-                if (Length != 1)
-                {
-                    _tail = _tail.Previous;
-                    _tail.Next = null;
-                    --Length;
-                }
-                else
-                {
-                    _head = null;
-                    _tail = null;
-                    Length = 0;
-                }
+                RemoveByIndex(Length - 1);
             }
         }
 
@@ -234,35 +233,25 @@ namespace List
         {
             if ((index == Length && Length == 0) || (index >= 0 && index < Length))
             {
-                if (index != 0 && index != Length - 1)
+                if (index != 0)
                 {
-                    if (Length != 1)
+                    DoubleNode current = GetNodeByIndex(index - 1);
+
+                    current.Next = current.Next.Next;
+
+                    if (current.Next is null)
                     {
-                        DoubleNode current = GetNodeByIndex(index - 1);
-
-                        current.Next = current.Next.Next;
-                        current.Next.Previous = current;
-
-                        if (current.Next is null)
-                        {
-                            _tail = current;
-                        }
+                        _tail = current;
                     }
                     else
                     {
-                        _head = null;
-                        _tail = null;
+                        current.Next.Previous = current;
                     }
-
                     --Length;
-                }
-                else if(index == 0)
-                {
-                    RemoveFirst();
                 }
                 else
                 {
-                    Remove();
+                    this.RemoveFirst();
                 }
             }
             else
@@ -277,11 +266,18 @@ namespace List
             {
                 if (Length != 0 && count != 0)
                 {
-                    if (Length - count >= 0)
+                    if (Length - count > 0)
                     {
-                        Length -= count;
-                        _tail = GetNodeByIndex(Length - 1);
-                        _tail.Next = null;
+                        if (count != 1)
+                        {
+                            Length -= count;
+                            _tail = GetNodeByIndex(Length - 1);
+                            _tail.Next = null;
+                        }
+                        else
+                        {
+                            Remove();
+                        }
                     }
                     else
                     {
@@ -303,7 +299,7 @@ namespace List
             {
                 if (Length != 0 && count != 0)
                 {
-                    if (Length - count >= 0)
+                    if (Length - count > 0)
                     {
                         _head = GetNodeByIndex(count);
                         Length -= count;
@@ -324,33 +320,41 @@ namespace List
 
         public void RemoveByIndex(int index, int count)
         {
-            if ((index >= 0 && index < Length) && count >= 0)
+            if (count >= 0)
             {
-                if (Length != 0 || count != 0)
-                {
-                    if (index != 0)
-                    {
-                        if (Length - index - count > 0)
-                        {
-                            DoubleNode sectionStart = GetNodeByIndex(index - 1);
-                            DoubleNode sectionEnd = GetNodeByIndex(index + count);
 
-                            sectionStart.Next = sectionEnd;
-                            sectionEnd.Previous = sectionStart;
-                            Length -= count;
+                if (index >= 0 && index < Length)
+                {
+                    if (Length != 0 || count != 0)
+                    {
+                        if (index != 0)
+                        {
+                            if (Length - index - count > 0)
+                            {
+                                DoubleNode sectionStart = GetNodeByIndex(index - 1);
+                                DoubleNode sectionEnd = GetNodeByIndex(index + count);
+
+                                sectionStart.Next = sectionEnd;
+                                sectionEnd.Previous = sectionStart;
+                                Length -= count;
+                            }
+                            else
+                            {
+                                DoubleNode sectionStart = GetNodeByIndex(index - 1);
+                                sectionStart.Next = null;
+                                _tail = sectionStart;
+                                Length = index;
+                            }
                         }
                         else
                         {
-                            DoubleNode sectionStart = GetNodeByIndex(index - 1);
-                            sectionStart.Next = null;
-                            _tail = sectionStart;
-                            Length = index;
+                            RemoveFirst(count);
                         }
                     }
-                    else
-                    {
-                        RemoveFirst(count);
-                    }
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Incorect index");
                 }
             }
             else
@@ -398,7 +402,34 @@ namespace List
                 RemoveByIndex(index);
                 index = GetIndexByValue(value);
             }
+        }
 
+        public void Reverse()
+        {
+            if (!(this is null))
+            {
+                if (Length > 1)
+                {
+                    DoubleNode stepByOne = _head.Next;
+
+                    _head.Previous = stepByOne;
+                    _head.Next = null;
+
+                    while (stepByOne != _tail)
+                    {
+                        DoubleNode tmp = stepByOne.Next;
+                        stepByOne.Next = stepByOne.Previous;
+                        stepByOne.Previous = tmp;
+
+                        stepByOne = stepByOne.Previous;
+                    };
+
+                    stepByOne.Next = stepByOne.Previous;
+                    stepByOne.Previous = null;
+                    _tail = _head;
+                    _head = stepByOne;
+                }
+            }
         }
 
         //// MaxI for Svyatoslav
@@ -410,6 +441,7 @@ namespace List
                 DoubleNode current = _head;
                 int maxIndex = 0;
                 int maxValue = _head.Value;
+
                 for (int i = 1; i < Length; i++)
                 {
                     if (maxValue < current.Next.Value)
@@ -439,7 +471,6 @@ namespace List
 
                 for (int i = 1; i < Length; i++)
                 {
-
                     if (minValue > current.Next.Value)
                     {
                         minValue = current.Next.Value;
@@ -454,6 +485,7 @@ namespace List
 
             throw new ArgumentException("List is null");
         }
+
 
         // Max for Svyatoslav
         // FindMaxElement for Maksim
@@ -505,34 +537,6 @@ namespace List
             throw new ArgumentException("List is null");
         }
 
-        public void Reverse()
-        {
-            if (!(this is null))
-            {
-                if (Length > 1)
-                {
-                    DoubleNode stepByOne = _head.Next;
-
-                    _head.Previous = stepByOne;
-                    _head.Next = null;
-
-                    while (stepByOne != _tail)
-                    {
-                        DoubleNode tmp = stepByOne.Next;
-                        stepByOne.Next = stepByOne.Previous;
-                        stepByOne.Previous = tmp;
-
-                        stepByOne = stepByOne.Previous;
-                    };
-
-                    stepByOne.Next = stepByOne.Previous;
-                    stepByOne.Previous = null;
-                    _tail = _head;
-                    _head = stepByOne;
-                }
-            }
-        }
-
         public void Sort(bool isDescending)
         {
             if (!(this is null))
@@ -544,7 +548,7 @@ namespace List
                     DoubleNode node = _head;
                     _head = _head.Next;
 
-                    if (new_root == null || (node.Value > new_root.Value && isDescending) || (node.Value < new_root.Value && !isDescending))
+                    if (new_root == null || (node.Value > new_root.Value && !isDescending) || (node.Value < new_root.Value && isDescending))
                     {
                         node.Next = new_root;
                         node.Previous = null;
@@ -564,7 +568,7 @@ namespace List
                     {
                         DoubleNode current = new_root;
 
-                        while ((current.Next != null && !(node.Value > current.Next.Value) && isDescending) || (current.Next != null && !(node.Value < current.Next.Value) && !isDescending))
+                        while ((current.Next != null && !(node.Value > current.Next.Value) && !isDescending) || (current.Next != null && !(node.Value < current.Next.Value) && isDescending))
                         {
                             current = current.Next;
                         }
@@ -589,10 +593,25 @@ namespace List
             }
         }
 
+        public int[] ToArray()
+        {
+            int[] arr = new int[Length];
+            int count = 0;
+            DoubleNode current = _head;
+            while (!(current is null))
+            {
+                arr[count] = current.Value;
+                ++count;
+                current = current.Next;
+            }
+
+            return arr;
+        }
+
         public override string ToString()
         {
-            StringBuilder stringBulder = new StringBuilder();
             DoubleNode current = _head;
+            StringBuilder stringBulder = new StringBuilder();
 
             while (!(current is null))
             {
@@ -601,6 +620,7 @@ namespace List
             }
 
             return stringBulder.ToString().Trim();
+
         }
 
         public override bool Equals(object obj)
@@ -630,6 +650,7 @@ namespace List
                         currentList = currentList.Next;
                         currentPrevThis = currentPrevThis.Previous;
                         currentPrevList = currentPrevList.Previous;
+
                     }
                 }
 
@@ -639,25 +660,44 @@ namespace List
             throw new ArgumentException("obj is not LinkedList");
         }
 
+        private DoubleLinkedList(int[] values)
+        {
+            Length = 0;
+
+            if (values.Length != 0)
+            {
+                for (int i = 0; i < values.Length; ++i)
+                {
+                    Add(values[i]);
+                }
+            }
+            else
+            {
+                _head = null;
+                _tail = null;
+            }
+        }
+
         private void InsertNode(DoubleNode newNode, DoubleNode current)
         {
             newNode.Next = current;
             newNode.Previous = current.Previous;
             current.Previous.Next = newNode;
             current.Previous = newNode;
+
         }
 
         private DoubleNode GetNodeByIndex(int index)
         {
-            if (index >= 0 || index < Length)
+            if (index >= 0 && index < Length)
             {
                 DoubleNode current;
 
-                if (index <= Length - 1 / 2)
+                if (index <= (Length - 1) / 2)
                 {
                     current = _head;
 
-                    for (int i = 1; i <= index; ++i)
+                    for (int i = 1; i <= index; i++)
                     {
                         current = current.Next;
                     }
@@ -666,13 +706,14 @@ namespace List
                 {
                     current = _tail;
 
-                    for (int i = Length - 2; i <= index; i--)
+                    for (int i = Length - 1; i > index; i--)
                     {
                         current = current.Previous;
                     }
                 }
 
                 return current;
+
             }
 
             throw new IndexOutOfRangeException("Index out of range");

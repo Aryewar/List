@@ -3,7 +3,7 @@ using System.Text;
 
 namespace List
 {
-    public class ArrayList
+    public class ArrayList: IList
     {
         public int Length { get; private set; }
 
@@ -24,22 +24,14 @@ namespace List
             _array[0] = value;
         }
 
-        public ArrayList(int[] initArray)
+        public static ArrayList Create(int[] initArray)
         {
-            if (initArray != null)
+            if (!(initArray == null))
             {
-                Length = initArray.Length;
-                _array = new int[(int)(Length * 1.33d + 1)];
+                return new ArrayList(initArray);
+            }
 
-                for (int i = 0; i < Length; ++i)
-                {
-                    _array[i] = initArray[i];
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException();
-            }
+            throw new ArgumentException("initArray is null");
         }
 
         public void Add(int value)
@@ -49,13 +41,16 @@ namespace List
             ++Length;
         }
 
-        public void Add(ArrayList list)
+        public void Add(IList obj)
         {
-            if (list != null)
+            if (!(obj is null))
             {
+                ArrayList list = ArrayList.Create(obj.ToArray());
                 int oldLength = Length;
                 Length += list.Length;
+
                 Resize(oldLength);
+
                 for (int i = 0; i < list.Length; ++i)
                 {
                     _array[oldLength + i] = list[i];
@@ -63,27 +58,7 @@ namespace List
             }
             else
             {
-                throw new ArgumentNullException();
-            }
-        }
-
-        public void AddFirst(ArrayList list)
-        {
-            if (list != null)
-            {
-                int oldLength = Length;
-                Length += list.Length;
-                Resize(oldLength);
-                ShiftRight(list.Length - 1, list.Length);
-
-                for (int i = 0; i < list.Length; ++i)
-                {
-                    _array[i] = list[i];
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("obj is null");
             }
         }
 
@@ -93,6 +68,18 @@ namespace List
             Resize(Length);
             ShiftRight(zeroIndex, shiftByOne);
             _array[zeroIndex] = value;
+        }
+
+        public void AddFirst(IList obj)
+        {
+            if (!(obj is null))
+            {
+                AddByIndex(zeroIndex, obj);
+            }
+            else
+            {
+                throw new ArgumentNullException("obj is null");
+            }
         }
 
         public void AddByIndex(int index, int value)
@@ -112,12 +99,14 @@ namespace List
             }
         }
 
-        public void AddByIndex(int index, ArrayList list)
+        public void AddByIndex(int index, IList obj)
         {
-            if ((index == 0 && Length == 0) || (index < Length && index >= 0))
+            if (!(obj is null))
             {
-                if (list != null)
+                if ((index == 0 && Length == 0) || (index < Length && index >= 0))
                 {
+                    ArrayList list = ArrayList.Create((obj.ToArray()));
+
                     int oldLength = Length;
                     Length += list.Length;
 
@@ -132,12 +121,12 @@ namespace List
                 }
                 else
                 {
-                    throw new ArgumentNullException();
-                }    
+                    throw new IndexOutOfRangeException("Index Out Of Randge ");
+                }
             }
             else
             {
-                throw new IndexOutOfRangeException("Index Out Of Randge ");
+                throw new ArgumentNullException(" obj is null");
             }
         }
 
@@ -308,12 +297,12 @@ namespace List
             }
         }
 
-        public int GetMax()
+        public int GetMaxElement()
         {
             return _array[GetMaxIndex()];
         }
 
-        public int GetMin()
+        public int GetMinElement()
         {
             return _array[GetMinIndex()];
         }
@@ -322,7 +311,14 @@ namespace List
         {
             get
             {
-                return _array[index];
+                if (index < Length && index >= 0)
+                {
+                    return _array[index];
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(" Index out of range");
+                }
             }
 
             set
@@ -331,8 +327,10 @@ namespace List
                 {
                     _array[index] = value;
                 }
-
-                throw new IndexOutOfRangeException("Index Out Of Randge ");
+                else
+                {
+                    throw new IndexOutOfRangeException(" Index out of range");
+                }
             }
         }
 
@@ -348,16 +346,17 @@ namespace List
 
         public void RemoveAllByValue(int value)
         {
-            int indexOfElements = GetIndexByValue(value);
-
-            while (indexOfElements != -1)
+            for (int i = 0; i < Length; i++)
             {
-                RemoveByIndex(indexOfElements);
-                indexOfElements = GetIndexByValue(value);
+                if (value == _array[i])
+                {
+                    RemoveByIndex(i);
+                    --i;
+                }
             }
         }
 
-        public void SortAscending()
+        public void Sort(bool isDecending)
         {
             if (_array != null)
             {
@@ -366,7 +365,7 @@ namespace List
                     int maxIndex = i;
                     for (int j = i; j < Length; ++j)
                     {
-                        if (_array[j] < _array[maxIndex])
+                        if ((_array[j] < _array[maxIndex] && isDecending) || (_array[j] > _array[maxIndex] && !isDecending))
                         {
                             maxIndex = j;
                         }
@@ -377,24 +376,15 @@ namespace List
             }
         }
 
-        public void SortDescending()
+        public int[] ToArray()
         {
-            if (_array != null)
-            {
-                for (int i = 0; i < Length; ++i)
-                {
-                    int maxIndex = i;
-                    for (int j = i; j < Length; ++j)
-                    {
-                        if (_array[j] > _array[maxIndex])
-                        {
-                            maxIndex = j;
-                        }
-                    }
+            int[] arr = new int[Length];
 
-                    Swap(i, maxIndex);
-                }
+            for (int i = 0; i < Length; i++)
+            {
+                arr[i] = _array[i];
             }
+            return arr;
         }
 
         public override string ToString()
@@ -429,6 +419,17 @@ namespace List
             }
 
             return isEqual;
+        }
+
+        private ArrayList(int[] initArray)
+        {
+            Length = initArray.Length;
+            _array = new int[(int)(Length * 1.33d + 1)];
+
+            for (int i = 0; i < Length; ++i)
+            {
+                _array[i] = initArray[i];
+            }
         }
 
         private void Resize(int oldLength)
@@ -469,8 +470,6 @@ namespace List
             _array[firstIndex] = _array[secondIndex];
             _array[secondIndex] = temp;
         }
-
-
     }
 }
 
